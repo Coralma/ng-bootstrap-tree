@@ -1,0 +1,138 @@
+<!doctype html>
+<html ng-app="myApp">
+<head>
+    <script src="../lib/angular/angular.js"></script>
+    <script src="../lib/lodash/lodash.js"></script>
+    <script src="../dist/ng-bootstrap-tree.js"></script>
+    <link rel="stylesheet" href="../lib/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="../dist/css/ng-bootstrap-tree.css">
+</head>
+<body>
+
+<body ng-controller="MyController">
+<div class="container">
+    <h1>Bootstrap Tree</h1>
+    <div style="width:100%">
+        <!--<abn-tree tree-data="treedata_geography" on-select="my_tree_handler(branch)" tree-control="my_tree" node-children="items" label-field="name"></abn-tree>-->
+        <tree-view options="treeOptions" on-select="my_tree_handler(branch)" tree-control="my_tree" node-children="items"
+                   label-field="name" initial-selection="{{defaultSelected}}" expand-level="{{expLevel}}"></tree-view>
+        <br>
+        <button type="button" class="btn btn-default" ng-click="selectFirst()">Select First</button>
+        <button type="button" class="btn btn-default" ng-click="expandAll()">Expand All</button>
+        <button type="button" class="btn btn-default" ng-click="filterData()">Filter</button>
+        <button type="button" class="btn btn-default" ng-click="revertData()">Revert</button>
+        <button type="button" class="btn btn-default" ng-click="addChild()">Add Child</button>
+        <input type="text" placeholder="Filter for..." ng-model = "filterInput">
+        <button class="btn btn-default" type="button" ng-click="doFilter()">Do Filter</button>
+        <input type="text" placeholder="Change Select Label" ng-model = "changeInput">
+        <button class="btn btn-default" type="button" ng-click="doChange()">Do Change</button>
+    </div>
+</div>
+<script>
+    angular.module('myApp', ['ng-bootstrap-tree']).controller('MyController', ['$scope','$q','$timeout', function($scope, $q,$timeout) {
+        var apple_selected, tree;
+        $scope.my_tree = tree = {};
+        $scope.expLevel = 2;
+        $scope.defaultSelected = 'North America';
+        $scope.addChild = function() {
+            var selectedNode = $scope.my_tree.get_selected_branch();
+            var newBranch = tree.add_branch(selectedNode, {
+                name: 'New Branch',
+                data: {
+                    something: 42,
+                    "else": 43
+                }
+            });
+            $scope.my_tree.select_branch(newBranch);
+        }
+        $scope.expandAll = function() {
+            $scope.my_tree.expand_all();
+        }
+
+        var allData = [
+            {
+                name: 'North America',
+                items: [
+                    {
+                        name: 'Canada',
+                        items: [{name:'Toronto'}, {name:'Vancouver'}]
+                    }/*, {
+                        name: 'USA',
+                        items: [{name:'New York'}, {name:'Los Angeles'}]
+                    }, {
+                        name: 'Mexico',
+                        items: [{name:'Mexico City'}, {name:'Guadalajara'}]
+                    }*/
+                ]
+            }
+        ];
+
+        $scope.treeOptions = {
+            labelField: 'name',
+            nodeChildren: 'items',
+            treeData : angular.copy(allData)
+        };
+        /*$scope.treedata_geography = angular.copy(allData);*/
+        $scope.doFilter = function() {
+            var rs = $scope.my_tree.filter($scope.filterInput);
+            console.log('Filter Result: ' + JSON.stringify(rs));
+        }
+        $scope.filterData = function() {
+            var defer = $q.defer();
+            var newItems = [
+                {
+                    name: 'North America',
+                    items: [
+                        {
+                            name: 'Canada',
+                            items: [{name:'New York'}, {name:'Los Angeles'}]
+                        }]
+                }
+            ];
+            angular.copy(newItems,$scope.treeOptions.treeData);
+/*            $scope.defaultSelected = 'Toronto';
+            $scope.expLevel = 2;*/
+            /*$scope.my_tree.to_expand_level();*/
+            /*$scope.my_tree.expand_all();*/
+            debugger;
+            /*$timeout(function() {*/
+                var node = $scope.treeOptions.treeData[0].items[0].items[0];
+                $scope.my_tree.select_branch(node);
+            /*}, 2000);*/
+            /*$scope.my_tree.select_branch(node);*/
+            /*$scope.my_tree.select_first_branch();*/
+            /*$scope.my_tree.select_branch(node);*/
+            /*$timeout(function() {
+                $scope.my_tree.select_branch(node);
+            },5000);*/
+
+
+        }
+        $scope.revertData= function() {
+            $scope.treedata_geography = angular.copy(allData, $scope.treedata_geography);
+            $scope.my_tree.expand_all();
+            $scope.my_tree.select_first_branch();
+        }
+
+        $scope.selectFirst = function() {
+            $scope.my_tree.select_first_branch();
+        }
+        $scope.my_tree_handler = function(branch) {
+            console.log('selected one node: ' + JSON.stringify(branch));
+            /*apple_selected(branch);
+            $scope.my_tree.select_branch(branch);*/
+        };
+        apple_selected = function(branch) {
+            return $scope.output = "APPLE! : " + branch.label;
+        };
+
+        $scope.doChange =function() {
+            var selectedNode = $scope.my_tree.get_selected_branch();
+            var newName = $scope.changeInput;
+            selectedNode.name = newName;
+        }
+    }]);
+</script>
+
+</body>
+</html>

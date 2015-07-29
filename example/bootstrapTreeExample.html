@@ -1,0 +1,96 @@
+<!doctype html>
+<html ng-app="myApp">
+<head>
+    <script src="../lib/angular/angular.js"></script>
+    <script src="../lib/lodash/lodash.js"></script>
+    <script src="../dist/ng-bootstrap-tree-backup.js"></script>
+    <link rel="stylesheet" href="../lib/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="../dist/css/ng-bootstrap-tree.css">
+</head>
+<body>
+
+<body ng-controller="MyController">
+<div class="container">
+    <h1>Bootstrap Tree</h1>
+    <div style="width:200px">
+        <tree-view options="treeOptions"></tree-view>
+        <br>
+        <button type="button" class="btn btn-default" ng-click="expandAll()">Expand All</button>
+        <button type="button" class="btn btn-default" ng-click="addChild()">Add Child</button>
+    </div>
+</div>
+<script>
+    angular.module('myApp', ['ng-bootstrap-tree']).controller('MyController', ['$scope', function($scope) {
+        $scope.treeOptions = {
+            labelField: 'label',
+            nodeChildren: 'children',
+            treeData : [
+                {
+                    label: 'North America',
+                    children: [
+                        {
+                            label: 'Canada',
+                            children: [{label:'Toronto'}, {label:'Vancouver'}]
+                        }, {
+                            label: 'USA',
+                            children: [{label:'New York'}, {label:'Los Angeles'}]
+                        }, {
+                            label: 'Mexico',
+                            children: [{label:'Mexico City'}, {label:'Guadalajara'}]
+                        }
+                    ]
+                }
+            ]
+        };
+
+
+
+
+        var apple_selected, tree;
+        $scope.my_tree = tree = {};
+
+        $scope.addChild = function() {
+            var selectedNode = $scope.my_tree.get_selected_branch();
+            var newBranch = tree.add_branch(selectedNode, {
+                label: 'New Branch',
+                data: {
+                    something: 42,
+                    "else": 43
+                }
+            });
+            $scope.my_tree.select_branch(newBranch);
+        }
+        $scope.expandAll = function() {
+            $scope.my_tree.expand_all();
+        }
+
+        $scope.treedata_geography = [
+            {
+                label: 'North America',
+                children: [
+                    {
+                        label: 'Canada',
+                        children: [{label:'Toronto'}, {label:'Vancouver'}]
+                    }, {
+                        label: 'USA',
+                        children: [{label:'New York'}, {label:'Los Angeles'}]
+                    }, {
+                        label: 'Mexico',
+                        children: [{label:'Mexico City'}, {label:'Guadalajara'}]
+                    }
+                ]
+            }
+        ];
+
+        $scope.my_tree_handler = function(branch) {
+            console.log('selected one node: ' + JSON.stringify(branch));
+            apple_selected(branch);
+        };
+        apple_selected = function(branch) {
+            return $scope.output = "APPLE! : " + branch.label;
+        };
+    }]);
+</script>
+
+</body>
+</html>
